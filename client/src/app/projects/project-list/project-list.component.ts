@@ -16,12 +16,14 @@ export interface PeriodicElement {
 })
 export class ProjectListComponent implements OnInit {
   projects: Project[] = [];
+  projectsLoaded: boolean = false;
   constructor(private projectsService: ProjectsService) {}
   displayedColumns: string[] = ['name', 'lead', 'actions'];
 
   ngOnInit(): void {
     this.projectsService.fetchProjects().subscribe((projects: Project[]) => {
       this.projects = projects;
+      this.projectsLoaded = true;
     });
   }
 }

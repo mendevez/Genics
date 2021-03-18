@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { ProjectsService } from './project.service';
 import { RouterModule } from '@angular/router';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   declarations: [ProjectsComponent, ProjectListComponent, ProjectAddComponent],
@@ -19,6 +20,7 @@ import { RouterModule } from '@angular/router';
     MatTableModule,
     MatIconModule,
     MatMenuModule,
+    SharedModule,
   ],
   providers: [ProjectsService],
 })
