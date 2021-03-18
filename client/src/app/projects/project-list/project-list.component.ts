@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 import { Project } from '../project.model';
 import { ProjectsService } from '../project.service';
 
@@ -15,15 +16,12 @@ export interface PeriodicElement {
   styleUrls: ['./project-list.component.css'],
 })
 export class ProjectListComponent implements OnInit {
-  projects: Project[] = [];
-  projectsLoaded: boolean = false;
+  projects: Observable<Project[]> = new Observable();
+
   constructor(private projectsService: ProjectsService) {}
   displayedColumns: string[] = ['name', 'lead', 'actions'];
 
   ngOnInit(): void {
-    this.projectsService.fetchProjects().subscribe((projects: Project[]) => {
-      this.projects = projects;
-      this.projectsLoaded = true;
-    });
+    this.projects = this.projectsService.fetchProjects();
   }
 }
