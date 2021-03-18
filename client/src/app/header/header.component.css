@@ -1,3 +1,24 @@
+.navbar {
+  padding: 2rem;
+  justify-content: space-between;
+}
 .app-title {
-    color:#673AB7;
+  color: #673ab7;
+}
+
+li {
+  list-style: none;
+}
+
+ul {
+  display: flex;
+}
+
+li {
+  padding-right: 0.8rem;
+  font-size: 1rem;
+}
+
+a {
+  color: #fff;
 }

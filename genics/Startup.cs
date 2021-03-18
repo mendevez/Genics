@@ -25,11 +25,11 @@ namespace genics
 
         public IConfiguration Configuration { get; }
 
+
+        readonly string MyAllowSpecificOrigins = "myspecificOrigins";
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {
-
-     
+        {     
             services.AddDbContext<ProjectContext> (options => options.UseSqlServer
             (Configuration.GetConnectionString("GenicsConnection")));
 
@@ -56,6 +56,8 @@ namespace genics
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
             app.UseAuthorization();
 
