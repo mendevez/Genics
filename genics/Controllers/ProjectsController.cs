@@ -44,7 +44,7 @@ namespace genics.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProjects()
+        public async Task<ActionResult> GetAllProjects()
         {
             return Ok(await _repository.GetAllProjects());
         }

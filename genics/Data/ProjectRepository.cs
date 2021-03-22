@@ -9,9 +9,9 @@ namespace genics.Data
 {
     public class ProjectRepository : IProjectRepository
     {
-        private readonly ProjectContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public ProjectRepository(ProjectContext context)
+        public ProjectRepository(ApplicationDbContext context)
         {
             _context = context;
         }

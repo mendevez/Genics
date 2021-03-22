@@ -8,7 +8,7 @@ using genics.Data;
 
 namespace genics.Migrations
 {
-    [DbContext(typeof(ProjectContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20210315050500_InitialCreate")]
     partial class InitialCreate
     {
