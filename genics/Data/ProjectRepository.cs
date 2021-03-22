@@ -16,24 +16,36 @@ namespace genics.Data
             _context = context;
         }
 
-        public async Task<Project> AddNewProject(Project project)
+        public async Task<RequestResponse <Project>> AddNewProject(Project project)
         {
             var result = await _context.AddAsync(project);
             await _context.SaveChangesAsync();
-            return result.Entity;
+            return new RequestResponse<Project>() { Data = result.Entity, Message = "Project created successfully", Success = true };
             
         }
-        public async Task<IEnumerable<Project>> GetAllProjects()
+        public async Task<RequestResponse<IEnumerable<Project>>> GetAllProjects()
         {
-            return await _context.Projects.ToListAsync();
+            RequestResponse<IEnumerable<Project>> response = new RequestResponse<IEnumerable<Project>>();
+
+            response.Data = await _context.Projects.ToListAsync();
+            response.Message = "Project list acquired successfully";
+            response.Success = true;
+
+            return response;
+            
         }
 
-        public async Task<Project>GetProjectById(int id)
+        public async Task<RequestResponse<Project>>GetProjectById(int id)
         {
-            return await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+            RequestResponse<Project> response = new RequestResponse<Project>();
+            response.Data = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+            response.Message = "Request successful";
+            response.Success = true;
+
+            return response;
         }
 
-        public async Task<Project> UpdateProject(Project project)
+        public async Task<RequestResponse<Project>> UpdateProject(Project project)
         {
             var result = await _context.Projects
                 .FirstOrDefaultAsync(e => e.Id == project.Id);
@@ -45,26 +57,27 @@ namespace genics.Data
 
                 await _context.SaveChangesAsync();
                 
-                return result;
+                return new RequestResponse<Project> { Data = result, Message = "Project updated successfully", Success = true };
             }
 
             return null;
 
         }
     
-        public async Task<Project> DeleteProject(int id)
+        public async Task<RequestResponse<Project>> DeleteProject(int id)
         {
            var project = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
 
            if(project != null)
            {
-               _context.Projects.Remove(project);
+               var result = _context.Projects.Remove(project);
                await _context.SaveChangesAsync();
-               return project;
+
+               return new RequestResponse<Project> { Data = result.Entity, Message = "Successfully deleted project", Success = true } ;
            }
 
-           return null;
-            
+           return new RequestResponse<Project> { Message = "Project not found", Success = false, Data = null };
+
         }
     }
 }

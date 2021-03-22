@@ -32,7 +32,7 @@ namespace genics.Controllers
 
                 var newProject = await _repository.AddNewProject(project);
 
-                return CreatedAtAction(nameof(AddNewProject), new { id = newProject.Id }, newProject);
+                return CreatedAtAction(nameof(AddNewProject), new { id = newProject.Data.Id }, newProject);
 
             }
             catch (Exception)
@@ -54,11 +54,11 @@ namespace genics.Controllers
         public async Task<ActionResult<Project>> GetProjectById(int id)
         {
             var project = await  _repository.GetProjectById(id);
-            if(project != null)
+            if(project.Data != null)
             {
                 return Ok(project);
             }
-            return NotFound();
+            return NotFound(new RequestResponse<Project> { Data = null, Message = "Project not found", Success = false });
             
         }
         [HttpPut("{id}")]
@@ -73,12 +73,13 @@ namespace genics.Controllers
                     return BadRequest("Wrong ID");
                 }
 
-                if( projectToBeUpdated == null)
+                if( projectToBeUpdated.Data == null)
                 {
-                    return NotFound();
+                    return NotFound(new RequestResponse<Project> { Data = null, Message= "Project not found", Success = false}) ;
                 }
 
-                return await _repository.UpdateProject(project);
+                var result = await _repository.UpdateProject(project);
+                return Ok(result);
             }
             catch (Exception)
             {
@@ -92,11 +93,11 @@ namespace genics.Controllers
         {
             var result = await _repository.DeleteProject(id);
 
-            if (result == null)
+            if (result.Data == null)
             {
-                return NotFound();
+                return NotFound(new RequestResponse<Project> { Data = null, Message = "Project not found", Success = false });
             }
-            return NoContent();
+            return Ok(result);
         }
 
     }

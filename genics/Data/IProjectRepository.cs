@@ -8,10 +8,10 @@ namespace genics.Data
 {
     public interface IProjectRepository
     {
-        Task<IEnumerable<Project>> GetAllProjects();
-        Task<Project> GetProjectById(int id);
-        Task<Project> AddNewProject(Project project);
-        Task<Project> UpdateProject(Project project);
-        Task<Project> DeleteProject(int id);
+        Task<RequestResponse<IEnumerable<Project>>> GetAllProjects();
+        Task<RequestResponse<Project>> GetProjectById(int id);
+        Task<RequestResponse<Project>> AddNewProject(Project project);
+        Task<RequestResponse<Project>> UpdateProject(Project project);
+        Task<RequestResponse<Project>> DeleteProject(int id);
     }
 }
