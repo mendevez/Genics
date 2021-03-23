@@ -18,6 +18,7 @@ namespace genics.Data
 
         public async Task<RequestResponse <Project>> AddNewProject(Project project)
         {
+
             var result = await _context.AddAsync(project);
             await _context.SaveChangesAsync();
             return new RequestResponse<Project>() { Data = result.Entity, Message = "Project created successfully", Success = true };
