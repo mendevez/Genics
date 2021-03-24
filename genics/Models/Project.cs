@@ -11,9 +11,13 @@ namespace genics.Models
          [MaxLength(50)]
          public string Name { get; set; }
          [Required]
-         public ApplicationUser Lead { get; set; }
+         [MaxLength(450)]
+         public string LeadId { get; set; }
+         [Required]
+         [MaxLength(100)]
+         public string LeadFullName { get; set; }
          public DateTime CreatedAt { get; set; } = DateTime.Now;
-         public List<ApplicationUser> Members { get; set; }
+         public IList<ApplicationUser> Users { get; set; }
     }
 
 }

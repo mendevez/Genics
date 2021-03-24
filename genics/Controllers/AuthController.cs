@@ -1,6 +1,8 @@
 ﻿using genics.Data;
 using genics.Dtos;
+using genics.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,7 +15,6 @@ namespace genics.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-
         private IUserRepository _userRepository;
         public AuthController(IUserRepository userRepository)
         {
@@ -33,7 +34,7 @@ namespace genics.Controllers
                 }
             }
 
-            return BadRequest(new AuthResponse { Message = "Could not register - invalid details", Success = false });
+            return BadRequest(new AuthResponse { User = null, Message = "Could not register - invalid details", Success = false });
         }
 
         [HttpPost("Login")]
@@ -45,13 +46,11 @@ namespace genics.Controllers
                 if(result.Success)
                 {
                     return Ok(result);
-
                 }
                 return BadRequest(result);
             }
 
-            return BadRequest(new AuthResponse { Message = "Could not login - invalid details", Success = false });
-            
+            return BadRequest(new AuthResponse { Message = "Could not login - invalid credentials", Success = false });
         }
 
     }

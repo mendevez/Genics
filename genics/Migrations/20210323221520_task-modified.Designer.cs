@@ -3,36 +3,23 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using genics.Data;
 
 namespace genics.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210323221520_task-modified")]
+    partial class taskmodified
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.4")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("ApplicationUserProject", b =>
-                {
-                    b.Property<int>("ProjectsId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UsersId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("ProjectsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("ApplicationUserProject");
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -192,8 +179,7 @@ namespace genics.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -212,13 +198,15 @@ namespace genics.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("ProjectId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Surname")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -237,6 +225,8 @@ namespace genics.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("ProjectId");
+
                     b.ToTable("AspNetUsers");
                 });
 
@@ -250,14 +240,7 @@ namespace genics.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("LeadFullName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("LeadId")
-                        .IsRequired()
-                        .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
@@ -267,10 +250,12 @@ namespace genics.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LeadId");
+
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("genics.Models.TaskModel", b =>
+            modelBuilder.Entity("genics.Models.Task", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -317,21 +302,6 @@ namespace genics.Migrations
                     b.HasIndex("ReporterId");
 
                     b.ToTable("Tasks");
-                });
-
-            modelBuilder.Entity("ApplicationUserProject", b =>
-                {
-                    b.HasOne("genics.Models.Project", null)
-                        .WithMany()
-                        .HasForeignKey("ProjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("genics.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -385,7 +355,23 @@ namespace genics.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("genics.Models.TaskModel", b =>
+            modelBuilder.Entity("genics.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("genics.Models.Project", null)
+                        .WithMany("Members")
+                        .HasForeignKey("ProjectId");
+                });
+
+            modelBuilder.Entity("genics.Models.Project", b =>
+                {
+                    b.HasOne("genics.Models.ApplicationUser", "Lead")
+                        .WithMany()
+                        .HasForeignKey("LeadId");
+
+                    b.Navigation("Lead");
+                });
+
+            modelBuilder.Entity("genics.Models.Task", b =>
                 {
                     b.HasOne("genics.Models.ApplicationUser", "AssignedTo")
                         .WithMany()
@@ -404,6 +390,11 @@ namespace genics.Migrations
                     b.Navigation("Project");
 
                     b.Navigation("Reporter");
+                });
+
+            modelBuilder.Entity("genics.Models.Project", b =>
+                {
+                    b.Navigation("Members");
                 });
 #pragma warning restore 612, 618
         }

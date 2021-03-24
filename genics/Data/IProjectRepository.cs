@@ -1,4 +1,5 @@
-﻿using genics.Models;
+﻿using genics.Dtos.Projects;
+using genics.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +9,10 @@ namespace genics.Data
 {
     public interface IProjectRepository
     {
-        Task<RequestResponse<IEnumerable<Project>>> GetAllProjects();
-        Task<RequestResponse<Project>> GetProjectById(int id);
-        Task<RequestResponse<Project>> AddNewProject(Project project);
-        Task<RequestResponse<Project>> UpdateProject(Project project);
-        Task<RequestResponse<Project>> DeleteProject(int id);
+        Task<IEnumerable<Project>> GetAllProjects();
+        Task<Project> GetProjectById(int id);
+        Task<Project> CreateProject(Project project);
+        Task<Project> UpdateProject(Project project);
+        Task DeleteProject(Project project);
     }
 }

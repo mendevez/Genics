@@ -14,7 +14,7 @@ namespace genics.Data
         }
 
         public DbSet<Project> Projects {get; set;}
-        public DbSet<Task> Tasks { get; set; }
+        public DbSet<TaskModel> Tasks { get; set; }
 
 
     }

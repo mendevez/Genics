@@ -1,4 +1,5 @@
 ﻿using genics.Dtos;
+using genics.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace genics.Data
     {
         Task<AuthResponse> RegisterNewUser(RegisterDto model);
         Task<AuthResponse> LoginUser(LoginDto model);
+        Task<ApplicationUser> GetUser(string id);
 
     }
 }

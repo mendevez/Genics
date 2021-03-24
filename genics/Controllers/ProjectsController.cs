@@ -1,7 +1,10 @@
-﻿using genics.Data;
+﻿using AutoMapper;
+using genics.Data;
+using genics.Dtos.Projects;
 using genics.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,91 +16,110 @@ namespace genics.Controllers
     [ApiController]
     public class ProjectsController : ControllerBase
     {
-        private readonly IProjectRepository _repository;
+        private readonly IProjectRepository _projectRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-
-        public ProjectsController(IProjectRepository repository)
+        public ProjectsController(IProjectRepository projectRepository, IMapper mapper, IUserRepository userRepository)
         {
-            _repository = repository;
-
+            _projectRepository = projectRepository;
+            _mapper = mapper;
+            _userRepository = userRepository;
         }
 
+        // POST api/projects/
         [HttpPost]
-        public async Task<ActionResult<Project>> AddNewProject(Project project) 
+        public async Task<IActionResult> CreateProject(ProjectCreateDto project) 
         {
-            try
-            {
-                if (project == null)
-                    return BadRequest();
+            if (project == null)
+                return BadRequest();
+              
+            var newProject = await _projectRepository.CreateProject(_mapper.Map<Project>(project));
+            var projectReadDto = _mapper.Map<ProjectReadDto>(newProject);
 
-                var newProject = await _repository.AddNewProject(project);
+            RequestResponse<ProjectReadDto> response = new RequestResponse<ProjectReadDto>
+            { 
+                Data = projectReadDto, 
+                Message = "Project created successfully", 
+                Success = true 
+            };
 
-                return CreatedAtAction(nameof(AddNewProject), new { id = newProject.Data.Id }, newProject);
-
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Unable to add project to database");
-            }
-
+            return CreatedAtAction(nameof(CreateProject), new { id = response.Data.Id }, response);
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAllProjects()
+        public async Task<IActionResult> GetAllProjects()
         {
-            return Ok(await _repository.GetAllProjects());
+            var projects = await _projectRepository.GetAllProjects();
+            RequestResponse<IEnumerable<ProjectReadDto>> response = new RequestResponse<IEnumerable<ProjectReadDto>>
+            {
+                Data = _mapper.Map<IEnumerable<ProjectReadDto>>(projects),
+                Message = "Projects fetched successfully",
+                Success = true
+            };
+          
+            return Ok(response);
         }
         
         // GET api/projects/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Project>> GetProjectById(int id)
+        public async Task<IActionResult> GetProjectById(int id)
         {
-            var project = await  _repository.GetProjectById(id);
-            if(project.Data != null)
+            var project = await  _projectRepository.GetProjectById(id);
+
+            if(project != null)
             {
-                return Ok(project);
+                RequestResponse<ProjectReadDto> response = new RequestResponse<ProjectReadDto>
+                {
+                    Data = _mapper.Map<ProjectReadDto>(project),
+                    Message = "Project retrieved successfully",
+                    Success = true
+                };
+
+                return Ok(response);
             }
-            return NotFound(new RequestResponse<Project> { Data = null, Message = "Project not found", Success = false });
+            return NotFound(new RequestResponse<ProjectReadDto> { Data = null, Message = "Project not found", Success = false });
             
         }
+        // PUT api/projects/{id}
         [HttpPut("{id}")]
-        public async Task<ActionResult<Project>> UpdateProject (int id, Project project)
+        public async Task<IActionResult> UpdateProject(int id, ProjectUpdateDto project)
         {
-            try
+            var projectToBeUpdated = await _projectRepository.GetProjectById(id);
+
+            if( projectToBeUpdated == null)
             {
-                var projectToBeUpdated = await _repository.GetProjectById(id);
-
-                if (id != project.Id)
-                {
-                    return BadRequest("Wrong ID");
-                }
-
-                if( projectToBeUpdated.Data == null)
-                {
-                    return NotFound(new RequestResponse<Project> { Data = null, Message= "Project not found", Success = false}) ;
-                }
-
-                var result = await _repository.UpdateProject(project);
-                return Ok(result);
+                return NotFound(new RequestResponse<ProjectReadDto> { Data = null, Message= "Project not found", Success = false}) ;
             }
-            catch (Exception)
+
+            _mapper.Map(project, projectToBeUpdated);
+
+            var result = await _projectRepository.UpdateProject(projectToBeUpdated);
+
+            RequestResponse<ProjectReadDto> response = new RequestResponse<ProjectReadDto>
             {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error updating project");
-            }
+                Data = _mapper.Map<ProjectReadDto>(result),
+                Message = "Project updated successfully",
+                Success = true
+            };
+
+            return Ok(response);
         }
 
+        // DELETE api/projects/{id}
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteProject(int id)
+        public async Task<IActionResult> DeleteProject(int id)
         {
-            var result = await _repository.DeleteProject(id);
+            var project = await _projectRepository.GetProjectById(id);
 
-            if (result.Data == null)
+            if (project == null)
             {
-                return NotFound(new RequestResponse<Project> { Data = null, Message = "Project not found", Success = false });
+                return NotFound(new RequestResponse<ProjectReadDto> { Data = null, Message = "Project not found", Success = false });
             }
-            return Ok(result);
+
+            await _projectRepository.DeleteProject(project);
+
+            return Ok(new RequestResponse<ProjectReadDto> { Data = null, Message = "Project successfully deleted", Success = true });
         }
 
     }
